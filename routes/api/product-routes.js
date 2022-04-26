@@ -1,7 +1,9 @@
-const router = require('express').Router();
-const { Product, Category, Tag, ProductTag } = require('../../models');
+const router = require("express").Router();
+const { Product, Category, Tag, ProductTag } = require("../../models");
 
-// get all products
+// The `/api/products` endpoint
+
+// Get all Products with associated Category and Tag data
 router.get("/", (req, res) => {
   Product.findAll({
     include: [
@@ -18,7 +20,7 @@ router.get("/", (req, res) => {
     });
 });
 
-// get one product
+// Get a single Product with associated Category and Tag data
 router.get("/:id", (req, res) => {
   Product.findOne({
     where: { id: req.params.id },
@@ -29,7 +31,7 @@ router.get("/:id", (req, res) => {
   })
     .then((data) => {
       if (!data) {
-        res.status(404).json({ message: "No product found with this specific id" });
+        res.status(404).json({ message: "No product found with this id" });
         return;
       }
       res.status(200).json(data);
@@ -41,7 +43,7 @@ router.get("/:id", (req, res) => {
 });
 
 // create new product
-router.post('/', (req, res) => {
+router.post("/", (req, res) => {
   /* req.body should look like this...
     {
       product_name: "Basketball",
@@ -73,7 +75,7 @@ router.post('/', (req, res) => {
 });
 
 // update product
-router.put('/:id', (req, res) => {
+router.put("/:id", (req, res) => {
   // update product data
   Product.update(req.body, {
     where: {
@@ -114,8 +116,20 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
-  // delete one product by its `id` value
+// Delete a single Product
+router.delete("/:id", (req, res) => {
+  Product.destroy({ where: { id: req.params.id } })
+    .then((data) => {
+      if (!data) {
+        res.status(404).json({ message: "No product found with this id" });
+        return;
+      }
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
 });
 
 module.exports = router;
